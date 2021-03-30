@@ -1,5 +1,7 @@
 const User = require('../Model/User')
+
 const bcrypt = require('bcryptjs')
+const jwt = require("jsonwebtoken")
 
 module.exports = {
     signUp: async(req, res) => {
@@ -7,13 +9,13 @@ module.exports = {
             let salted = await bcrypt.genSalt(10);
             let hashedPassword = await bcrypt.hash(req.body.password, salted);
 
-            let createdUser = await new User({
+            let createUser = await new User({
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
                 email: req.body.email,
                 password: hashedPassword,
             })
-            let savedUser = await createdUser.save();
+            let savedUser = await createUser.save();
 
             res.json({
                 data: savedUser,
@@ -37,8 +39,15 @@ module.exports = {
             if(!comparedPassword) {
                 throw { message: "Please check your email and password"}
             } else {
+                let jwtToken = jwt.sign(
+                    {
+                        email: foundUser.email,
+                    },
+                    process.env.JWT_SECRET,
+                    { expiresIn: "24hr"}
+                )
                 res.json({
-                    message: "success"
+                    jwtToken: jwtToken
                 })  
             }
 
