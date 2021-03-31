@@ -5,7 +5,7 @@ const checkIsUserHaveValidToken = async (req, res, next) => {
     try {
         if (req.headers && req.headers.authorization) {
             let jwtToken = req.headers.authorization.slice(7)
-            let decodedJWT = jwt.verify(jwtToken, process.env.JWT_VERY_SECRET);
+            let decodedJWT = jwt.verify(jwtToken, process.env.JWT_SECRET);
             if (decodedJWT) {
                 next();
             }
